@@ -6,7 +6,12 @@
 	date_default_timezone_set("Asia/Taipei");
 	$time_now = date('H:i:s'); 
 	$xml_dir  = "../XML/" . date(Ymd) . ".xml";
-	$xml = simplexml_load_file($xml_dir) or die("Error: Cannot create object");
+	if(file_exists($xml_dir)){
+		$xml = simplexml_load_file($xml_dir) or die("Error: Cannot create object");
+	}
+	else{  // if xml file doesn't exist, go to download
+		header("Location:'downloadXML.php'");
+	}
 	// start to search available train schedules
 	$schedule_array = array();
 	foreach($xml->children() as $traininfo){

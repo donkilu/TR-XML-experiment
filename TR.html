@@ -4,7 +4,7 @@
     <title>台鐵即時列車資訊</title>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
     <meta http-equiv="Content-Language" value="zh-TW" />
-    <link rel="icon" href="img/camo.ico" type="image/x-icon" />
+    <link rel="icon" href="img/TRA_logo.ico" type="image/x-icon" />
     <!-- Bootstrap core CSS & datepicker -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Custom styles -->
@@ -14,21 +14,28 @@
   <body>
     <div class="container">
       <div class="header clearfix">
-        <h3 class="text-muted">台鐵即時列車資訊</h3>
-		<div id="time_div"></div>
+        <div class="col-md-9">
+			<h3 class="text-muted">台鐵即時列車資訊</h3>
+			<div id="time_div"></div>
+		</div>
+		<div class="form-group col-md-3">
+			<label for="station">車站</label>
+			<select class="form-control" id="station_select">
+			</select>
+		</div>
       </div>
 	  
 	  <div class="marketing" id="showcase">
-		<div class="row" style="font-size: 26px;">
+		<div class="row" style="font-size: 25px;">
 			<div class="col-md-3">時間</div>
-			<div class="col-md-3">車種</div>
-			<div class="col-md-4">開往</div>
+			<div class="col-md-4">車種</div>
+			<div class="col-md-3">開往</div>
 			<div class="col-md-2">車次</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3">DEPARTURE TIME</div>
-			<div class="col-md-3">TRAIN CLASS</div>
-			<div class="col-md-4">DESTINATION</div>
+			<div class="col-md-4">TRAIN CLASS</div>
+			<div class="col-md-3">DESTINATION</div>
 			<div class="col-md-2">TRAIN NO.</div>
 		</div>
 	</div>
@@ -45,36 +52,407 @@
   <script src="jquery/jquery-1.11.2.min.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <script language=javascript>
+    // train class translation table
+	var train_class_table = [];
+	train_class_table.push({id:1100, ZH:"自強", EN:"Tze-Chiang Limited Express"});
+	train_class_table.push({id:1101, ZH:"自強", EN:"Tze-Chiang Limited Express"});
+	train_class_table.push({id:1108, ZH:"自強", EN:"Tze-Chiang Limited Express"});
+	train_class_table.push({id:1102, ZH:"太魯閣", EN:"Taroko Limited Express"});
+	train_class_table.push({id:1107, ZH:"普悠瑪", EN:"Puyuma Limited Express"});
+	train_class_table.push({id:1110, ZH:"莒光", EN:"Chu-Kuang Express"});
+	train_class_table.push({id:1120, ZH:"復興", EN:"Fu-Hsing Semi Express"});
+	train_class_table.push({id:1130, ZH:"電車", EN:"Electric Multiple Unit"});
+	train_class_table.push({id:1131, ZH:"區間車", EN:"Local Train"});
+	train_class_table.push({id:1132, ZH:"區間快", EN:"Fast Local Train"});
+	train_class_table.push({id:1140, ZH:"普快車", EN:"Ordinary Train"});
+	train_class_table.push({id:1141, ZH:"柴快車", EN:"Disel Rail Car"});
+	train_class_table.push({id:1150, ZH:"柴油車", EN:"N/A"});
+
+	// station translation table
+	var station_table = [];
+	// 台北-新竹
+	station_table.push({id:1001, ZH:"基隆", EN:"Keelung"});
+	station_table.push({id:1002, ZH:"八堵", EN:"Badu"});
+	station_table.push({id:1003, ZH:"七堵", EN:"Cidu"});
+	station_table.push({id:1004, ZH:"五堵", EN:"Wudu"});
+	station_table.push({id:1030, ZH:"百福", EN:"Baifu"});
+	station_table.push({id:1031, ZH:"汐科", EN:"Xike"});
+	station_table.push({id:1005, ZH:"汐止", EN:"Sijhih"});
+	station_table.push({id:1006, ZH:"南港", EN:"Nangang"});
+	station_table.push({id:1007, ZH:"松山", EN:"Songshan"});
+	station_table.push({id:1008, ZH:"台北", EN:"Taipei"});
+	station_table.push({id:1009, ZH:"萬華", EN:"Wanhua"});
+	station_table.push({id:1011, ZH:"板橋", EN:"Banciao"});
+	station_table.push({id:1032, ZH:"浮洲", EN:"Fuzhou"});
+	station_table.push({id:1012, ZH:"樹林", EN:"Shulin"});
+	station_table.push({id:1013, ZH:"山佳", EN:"Shanjia"});
+	station_table.push({id:1014, ZH:"鶯歌", EN:"Yingge"});
+	station_table.push({id:1015, ZH:"桃園", EN:"Taoyuan"});
+	station_table.push({id:1016, ZH:"內壢", EN:"Neili"});
+	station_table.push({id:1017, ZH:"中壢", EN:"Jhongli"});
+	station_table.push({id:1018, ZH:"埔心", EN:"Pusin"});
+	station_table.push({id:1019, ZH:"楊梅", EN:"Yangmei"});
+	station_table.push({id:1020, ZH:"富岡", EN:"Fugang"});
+	station_table.push({id:1033, ZH:"北湖", EN:"Beihu"});
+	station_table.push({id:1021, ZH:"湖口", EN:"Hukou"});
+	station_table.push({id:1022, ZH:"新豐", EN:"Sinfong"});
+	station_table.push({id:1023, ZH:"竹北", EN:"Jhubei"});
+	station_table.push({id:1024, ZH:"北新竹", EN:"North Hsinchu"});
+	station_table.push({id:1025, ZH:"新竹", EN:"Hsinchu"});
+	station_table.push({id:1026, ZH:"香山", EN:"Siangshan"});
+	station_table.push({id:1027, ZH:"崎頂", EN:"Ciding"});
+	station_table.push({id:1028, ZH:"竹南", EN:"Jhunan"});
+	station_table.push({id:1029, ZH:"三坑", EN:"Sankeng"});
+	// 海線
+	station_table.push({id:1102, ZH:"談文", EN:"Tanwan"});
+	station_table.push({id:1103, ZH:"談文南", EN:"Tanwannan"});
+	station_table.push({id:1104, ZH:"大山", EN:"Dashan"});
+	station_table.push({id:1105, ZH:"後龍", EN:"Houlong"});
+	station_table.push({id:1107, ZH:"白沙屯", EN:"Baishatun"});
+	station_table.push({id:1108, ZH:"新埔", EN:"Sinpu"});
+	station_table.push({id:1109, ZH:"通霄", EN:"Tongsiao"});
+	station_table.push({id:1110, ZH:"苑裡", EN:"Yuanli"});
+	station_table.push({id:1111, ZH:"日南", EN:"Rihnan"});
+	station_table.push({id:1112, ZH:"大甲", EN:"Dajia"});
+	station_table.push({id:1113, ZH:"台中港", EN:"Taichung Port"});
+	station_table.push({id:1114, ZH:"清水", EN:"Cingshuei"});
+	station_table.push({id:1115, ZH:"沙鹿", EN:"Shalu"});
+	station_table.push({id:1116, ZH:"龍井", EN:"Longjing"});
+	station_table.push({id:1117, ZH:"大肚", EN:"Dadu"});
+	station_table.push({id:1118, ZH:"追分", EN:"Jhuifen"});
+	station_table.push({id:1119, ZH:"大肚溪南", EN:"Dadu River South"});
+	// 彰化-高雄
+	station_table.push({id:1120, ZH:"彰化", EN:"Changhua"});
+	station_table.push({id:1202, ZH:"花壇", EN:"Huatan"});
+	station_table.push({id:1203, ZH:"員林", EN:"Yuanlin"});
+	station_table.push({id:1204, ZH:"永靖", EN:"Yongjing"});
+	station_table.push({id:1205, ZH:"社頭", EN:"Shetou"});
+	station_table.push({id:1206, ZH:"田中", EN:"Tianjhong"});
+	station_table.push({id:1207, ZH:"二水", EN:"Ershuei"});
+	station_table.push({id:1208, ZH:"林內", EN:"Linnei"});
+	station_table.push({id:1209, ZH:"石榴", EN:"Shihliou"});
+	station_table.push({id:1210, ZH:"斗六", EN:"Douliou"});
+	station_table.push({id:1211, ZH:"斗南", EN:"Dounan"});
+	station_table.push({id:1212, ZH:"石龜", EN:"Shihguei"});
+	station_table.push({id:1213, ZH:"大林", EN:"Dalin"});
+	station_table.push({id:1214, ZH:"民雄", EN:"Minsyong"});
+	station_table.push({id:1215, ZH:"嘉義", EN:"Chiayi"});
+	station_table.push({id:1217, ZH:"水上", EN:"Shueishang"});
+	station_table.push({id:1218, ZH:"南靖", EN:"Nanjing"});
+	station_table.push({id:1219, ZH:"後壁", EN:"Houbi"});
+	station_table.push({id:1220, ZH:"新營", EN:"Sinying"});
+	station_table.push({id:1221, ZH:"柳營", EN:"Liouying"});
+	station_table.push({id:1222, ZH:"林鳳營", EN:"Linfongying"});
+	station_table.push({id:1223, ZH:"隆田", EN:"Longtian"});
+	station_table.push({id:1224, ZH:"拔林", EN:"Balin"});
+	station_table.push({id:1225, ZH:"善化", EN:"Shanhua"});
+	station_table.push({id:1226, ZH:"新市", EN:"Sinshih"});
+	station_table.push({id:1227, ZH:"永康", EN:"Yongkang"});
+	station_table.push({id:1228, ZH:"台南", EN:"Tainan"});
+	station_table.push({id:1229, ZH:"保安", EN:"Baoan"});
+	station_table.push({id:1243, ZH:"仁德", EN:"Rende"});	
+	station_table.push({id:1230, ZH:"中洲", EN:"Jhongjhou"});
+	station_table.push({id:1231, ZH:"大湖", EN:"Dahu"});
+	station_table.push({id:1232, ZH:"路竹", EN:"Lujhu"});
+	station_table.push({id:1233, ZH:"岡山", EN:"Gangshan"});
+	station_table.push({id:1234, ZH:"橋頭", EN:"Ciaotou"});
+	station_table.push({id:1235, ZH:"楠梓", EN:"Nanzih"});
+	station_table.push({id:1236, ZH:"左營", EN:"Zuoying"});
+	station_table.push({id:1237, ZH:"鼓山", EN:"Gushan"});
+	station_table.push({id:1238, ZH:"高雄", EN:"Kaohsiung"});
+	station_table.push({id:1239, ZH:"大橋", EN:"Daqiao"});
+	station_table.push({id:1240, ZH:"大村", EN:"Datsun"});
+	station_table.push({id:1241, ZH:"嘉北", EN:"ChiaPei"});
+	station_table.push({id:1242, ZH:"新左營", EN:"Xinzuoying"});
+	// 山線
+	station_table.push({id:1302, ZH:"造橋", EN:"Zaoqiao"});
+	station_table.push({id:1304, ZH:"豐富", EN:"Fongfu"});
+	station_table.push({id:1305, ZH:"苗栗", EN:"Miaoli"});
+	station_table.push({id:1307, ZH:"南勢", EN:"Nanshih"});
+	station_table.push({id:1308, ZH:"銅鑼", EN:"Tongluo"});
+	station_table.push({id:1310, ZH:"三義", EN:"Sanyi"});
+	station_table.push({id:1314, ZH:"泰安", EN:"Taian"});
+	station_table.push({id:1315, ZH:"后里", EN:"Houli"});
+	station_table.push({id:1317, ZH:"豐原", EN:"Fongyuan"});
+	station_table.push({id:1318, ZH:"潭子", EN:"Tanzih"});
+	station_table.push({id:1319, ZH:"烏日", EN:"Wuri"});
+	station_table.push({id:1321, ZH:"成功", EN:"Chenggong"});
+	station_table.push({id:1322, ZH:"大慶", EN:"Daqing"});
+	station_table.push({id:1323, ZH:"太原", EN:"Taiyuan"});
+	station_table.push({id:1324, ZH:"新烏日", EN:"Xinwuri"});
+	// 屏東線
+	station_table.push({id:1402, ZH:"鳳山", EN:"Fongshan"});
+	station_table.push({id:1403, ZH:"後庄", EN:"Houjhuang"});
+	station_table.push({id:1404, ZH:"九曲堂", EN:"Jioucyutang"});
+	station_table.push({id:1405, ZH:"六塊厝", EN:"Lioukuaicuo"});
+	station_table.push({id:1406, ZH:"屏東", EN:"Pingtung"});
+	station_table.push({id:1407, ZH:"歸來", EN:"Gueilai"});
+	station_table.push({id:1408, ZH:"麟洛", EN:"Linluo"});
+	station_table.push({id:1409, ZH:"西勢", EN:"Sishih"});
+	station_table.push({id:1410, ZH:"竹田", EN:"Jhutian"});
+	station_table.push({id:1411, ZH:"潮州", EN:"Chaojhou"});
+	station_table.push({id:1412, ZH:"崁頂", EN:"Kanding"});
+	station_table.push({id:1413, ZH:"南州", EN:"Nanjhou"});
+	station_table.push({id:1414, ZH:"鎮安", EN:"Jhenan"});
+	station_table.push({id:1415, ZH:"林邊", EN:"Linbian"});
+	station_table.push({id:1416, ZH:"佳冬", EN:"Jiadong"});
+	station_table.push({id:1417, ZH:"東海", EN:"Donghai"});
+	station_table.push({id:1418, ZH:"枋寮", EN:"Fangliao"});
+	// 南迴線
+	station_table.push({id:1502, ZH:"加祿", EN:"Jialu"});
+	station_table.push({id:1503, ZH:"內獅", EN:"Neishih"});
+	station_table.push({id:1504, ZH:"枋山", EN:"Fangshan"});
+	station_table.push({id:1505, ZH:"枋野", EN:"Fangye"});
+	station_table.push({id:1506, ZH:"中央", EN:"Central Signal"});
+	station_table.push({id:1507, ZH:"古莊", EN:"Gujhuang"});
+	station_table.push({id:1508, ZH:"大武", EN:"Dawu"});
+	station_table.push({id:1510, ZH:"瀧溪", EN:"Lunghsi"});
+	station_table.push({id:1511, ZH:"多良", EN:"Duoliang"});
+	station_table.push({id:1512, ZH:"金崙", EN:"Jinlun"});
+	station_table.push({id:1514, ZH:"太麻里", EN:"Taimali"});
+	station_table.push({id:1516, ZH:"知本", EN:"Jhihben"});
+	station_table.push({id:1517, ZH:"康樂", EN:"Kangle"});
+	// 台東線
+	station_table.push({id:1602, ZH:"吉安", EN:"Jian"});
+	station_table.push({id:1604, ZH:"志學", EN:"Jhihsyue"});
+	station_table.push({id:1605, ZH:"平和", EN:"Pinghe"});
+	station_table.push({id:1606, ZH:"壽豐", EN:"Shoufong"});
+	station_table.push({id:1607, ZH:"豐田", EN:"Fongtian"});
+	station_table.push({id:1608, ZH:"溪口", EN:"Sikou"});
+	station_table.push({id:1609, ZH:"南平", EN:"Nanping"});
+	station_table.push({id:1610, ZH:"鳳林", EN:"Fonglin"});
+	station_table.push({id:1611, ZH:"萬榮", EN:"Wanrong"});
+	station_table.push({id:1612, ZH:"光復", EN:"Guangfu"});
+	station_table.push({id:1613, ZH:"大富", EN:"Dafu"});
+	station_table.push({id:1614, ZH:"富源", EN:"Fuyuan"});
+	station_table.push({id:1616, ZH:"瑞穗", EN:"Rueisuei"});
+	station_table.push({id:1617, ZH:"三民", EN:"Sanmin"});
+	station_table.push({id:1619, ZH:"玉里", EN:"Yuli"});
+	station_table.push({id:1620, ZH:"安通", EN:"Antung"});
+	station_table.push({id:1621, ZH:"東里", EN:"Dongli"});
+	station_table.push({id:1622, ZH:"東竹", EN:"Dongjhu"});
+	station_table.push({id:1623, ZH:"富里", EN:"Fuli"});
+	station_table.push({id:1624, ZH:"池上", EN:"Chihshang"});
+	station_table.push({id:1625, ZH:"海端", EN:"Haiduan"});
+	station_table.push({id:1626, ZH:"關山", EN:"Guanshan"});
+	station_table.push({id:1627, ZH:"月美", EN:"Yuemei"});
+	station_table.push({id:1628, ZH:"瑞和", EN:"Rueihe"});
+	station_table.push({id:1629, ZH:"瑞源", EN:"Rueiyuan"});
+	station_table.push({id:1630, ZH:"鹿野", EN:"Luye"});
+	station_table.push({id:1631, ZH:"山里", EN:"Shanli"});
+	station_table.push({id:1632, ZH:"台東", EN:"Taitung"});
+	station_table.push({id:1633, ZH:"馬蘭(廢)", EN:"Malan"});
+	station_table.push({id:1634, ZH:"台東(廢)", EN:"Taitung"});
+	station_table.push({id:1635, ZH:"舞鶴", EN:"Wuhe"});
+	// 北迴線
+	station_table.push({id:1703, ZH:"永樂", EN:"Yongle"});
+	station_table.push({id:1704, ZH:"東澳", EN:"Dongao"});
+	station_table.push({id:1705, ZH:"南澳", EN:"Nanao"});
+	station_table.push({id:1706, ZH:"武塔", EN:"Wuta"});
+	station_table.push({id:1708, ZH:"漢本", EN:"Hanben"});
+	station_table.push({id:1709, ZH:"和平", EN:"Heping"});
+	station_table.push({id:1710, ZH:"和仁", EN:"Horen"});
+	station_table.push({id:1711, ZH:"崇德", EN:"Chongde"});
+	station_table.push({id:1712, ZH:"新城", EN:"Sincheng"});
+	station_table.push({id:1713, ZH:"景美", EN:"Jingmei"});
+	station_table.push({id:1714, ZH:"北埔", EN:"Beipu"});
+	station_table.push({id:1715, ZH:"花蓮", EN:"Hualien"});
+	// 宜蘭線
+	station_table.push({id:1802, ZH:"暖暖", EN:"Nuannuan"});
+	station_table.push({id:1803, ZH:"四腳亭", EN:"Sihjiaoting"});
+	station_table.push({id:1804, ZH:"瑞芳", EN:"Rueifang"});
+	station_table.push({id:1805, ZH:"猴硐", EN:"Houtung"});
+	station_table.push({id:1806, ZH:"三貂嶺", EN:"Sandiaoling"});
+	station_table.push({id:1807, ZH:"牡丹", EN:"Mudan"});
+	station_table.push({id:1808, ZH:"雙溪", EN:"Shuangsi"});
+	station_table.push({id:1809, ZH:"貢寮", EN:"Gungliao"});
+	station_table.push({id:1810, ZH:"福隆", EN:"Fulong"});
+	station_table.push({id:1811, ZH:"石城", EN:"Shihcheng"});
+	station_table.push({id:1812, ZH:"大里", EN:"Dali"});
+	station_table.push({id:1813, ZH:"大溪", EN:"Dasi"});
+	station_table.push({id:1814, ZH:"龜山", EN:"Gueishan"});
+	station_table.push({id:1815, ZH:"外澳", EN:"Waiao"});
+	station_table.push({id:1816, ZH:"頭城", EN:"Toucheng"});
+	station_table.push({id:1817, ZH:"頂埔", EN:"Dingpu"});
+	station_table.push({id:1818, ZH:"礁溪", EN:"Jiaohsi"});
+	station_table.push({id:1819, ZH:"四城", EN:"Sihcheng"});
+	station_table.push({id:1820, ZH:"宜蘭", EN:"Yilan"});
+	station_table.push({id:1821, ZH:"二結", EN:"Erjie"});
+	station_table.push({id:1822, ZH:"中里", EN:"Jhongli"});
+	station_table.push({id:1823, ZH:"羅東", EN:"Luodong"});
+	station_table.push({id:1824, ZH:"冬山", EN:"Dongshan"});
+	station_table.push({id:1825, ZH:"新馬", EN:"Sinma"});
+	station_table.push({id:1826, ZH:"蘇澳新", EN:"Suaoxin"});
+	station_table.push({id:1827, ZH:"蘇澳", EN:"Suao"});
+	// 平溪線
+	station_table.push({id:1903, ZH:"大華", EN:"Dahua"});
+	station_table.push({id:1904, ZH:"十分", EN:"Shihfen"});
+	station_table.push({id:1905, ZH:"望古", EN:"Wanggu"});
+	station_table.push({id:1906, ZH:"嶺腳", EN:"Lingjiao"});
+	station_table.push({id:1907, ZH:"平溪", EN:"Pingsi"});
+	station_table.push({id:1908, ZH:"菁桐", EN:"Jingtong"});
+	// 林口線 (廢止)
+	station_table.push({id:2105, ZH:"桃中", EN:"Taoyuan Senior High"});
+	station_table.push({id:2106, ZH:"寶山", EN:"Baoshan"});
+	station_table.push({id:2107, ZH:"南祥", EN:"Nanxiang"});
+	station_table.push({id:2102, ZH:"五福", EN:"Wufu"});
+	station_table.push({id:2108, ZH:"長興", EN:"Changxing"});
+	station_table.push({id:2109, ZH:"海山", EN:"Haishan"});
+	station_table.push({id:2110, ZH:"海湖", EN:"Haihu"});
+	station_table.push({id:2103, ZH:"林口", EN:"Linkou"});
+	station_table.push({id:2104, ZH:"電廠", EN:"N/A"});
+	// 內灣線
+	station_table.push({id:2212, ZH:"千甲", EN:"Qianjia"});
+	station_table.push({id:2213, ZH:"新莊", EN:"Xinzhuang"});
+	station_table.push({id:2203, ZH:"竹中", EN:"Jhujhong"});
+	station_table.push({id:2204, ZH:"上員", EN:"Shangyuan"});
+	station_table.push({id:2205, ZH:"竹東", EN:"Jhudong"});
+	station_table.push({id:2206, ZH:"橫山", EN:"Hengshan"});
+	station_table.push({id:2207, ZH:"九讚頭", EN:"jiouzantou"});
+	station_table.push({id:2208, ZH:"合興", EN:"Hesing"});
+	// 六家線
+	station_table.push({id:2214, ZH:"六家", EN:"Liujia"});
+	// 台中港線
+	station_table.push({id:2302, ZH:"台中港貨", EN:"Taichung Port"});
+	station_table.push({id:2402, ZH:"龍井煤場", EN:"Longjing"});
+	// 集集線
+	station_table.push({id:2502, ZH:"神岡", EN:"Shangang"});
+	station_table.push({id:2702, ZH:"源泉", EN:"Yuanciyuan"});
+	station_table.push({id:2703, ZH:"濁水", EN:"Jhuoshuei"});
+	station_table.push({id:2704, ZH:"龍泉", EN:"Lungcyuan"});
+	station_table.push({id:2705, ZH:"集集", EN:"Jiji"});
+	station_table.push({id:2706, ZH:"水里", EN:"Shueili"});
+	station_table.push({id:2707, ZH:"車埕", EN:"Checheng"});
+	// 高雄臨港線
+	station_table.push({id:2802, ZH:"南調", EN:"Nandiao"});
+	station_table.push({id:2902, ZH:"高雄港", EN:"Kaohsiung Port"});
+	station_table.push({id:3102, ZH:"前鎮", EN:"Qianzhen"});
+	// 花蓮臨港線
+	station_table.push({id:3202, ZH:"花蓮港", EN:"Hualien Port"});
+	// 軍用支線
+	station_table.push({id:3302, ZH:"中興一號", EN:"N/A"});
+	station_table.push({id:3402, ZH:"中興二號", EN:"N/A"});
+	// 沙崙線
+	station_table.push({id:1244, ZH:"南科", EN:"Nanke"});
+	station_table.push({id:5101, ZH:"長榮大學", EN:"Chang Jung Christian University"});
+	station_table.push({id:5102, ZH:"沙崙", EN:"Shalun"});	 
+	// 深澳線
+	station_table.push({id:6103, ZH:"海科館", EN:"Haikeguan"});
+	station_table.push({id:2002, ZH:"深澳", EN:"Shen'ao"});
+	// 其他
+	station_table.push({id:3902, ZH:"機廠", EN:"N/A"});
+	station_table.push({id:4102, ZH:"樹調", EN:"ShuDiao"});
+	station_table.push({id:4202, ZH:"東港支線", EN:"N/A"});
+	station_table.push({id:4302, ZH:"東南支線", EN:"N/A"});
+
+	
+	
 	$(document).ready(function(){	//executed after the page has loaded
+		addStation();
 		AJAXsearch();
 		timeUpdate();
 	});
+	
+	function addStation(){
+		var default_station = 1812;
+		for(i=0;i<station_table.length;i++){
+			if(station_table[i].id == default_station){
+				$('#station_select').append(
+					"<option value=" + station_table[i].id + " selected>" + station_table[i].ZH + "</option>"
+				);
+			}
+			else{ 
+				$('#station_select').append(
+					"<option value=" + station_table[i].id + ">" + station_table[i].ZH + "</option>"
+				);
+			}
+		}
+	};
 	
 	function AJAXsearch(){
 	    $.ajax({
 			type: 'POST',
 			url: 'php/analyzeXML.php',
-			data: { target: "1812" },
+			data: { target: $('#station_select').val() },
 			error: function(){
 				alert('AJAX request抓取資料失敗，請重新整理頁面');
 			},
 			success: function(JSONresponse){
-				$('#showcase schedule').remove();
+				$('#showcase .schedule').fadeOut();
+				$('#showcase hr').fadeOut();
+				$('#showcase .schedule').remove();
+				$('#showcase hr').remove();
 				$.each( JSONresponse, function(i, schedule){
-					var car_class = classBlockHTML(schedule['CarClass']);
+					var depart_time = schedule['DEPTime'].split(":");
+					var depart_div = "<div class='col-md-3' style='font-size:70px; line-height:90px;'>"
+								     + depart_time[0] + ":" + depart_time[1]
+								     + "<\/div>"; 
+					var class_div;
+					for(i=0;i<train_class_table.length;i++){
+						if(train_class_table[i].id == parseInt(schedule['CarClass'])){
+							class_div = "<div class='col-md-4'";
+							if(train_class_table[i].id == 1100 || train_class_table[i].id == 1101 || train_class_table[i].id == 1108){  // Tse-Chiang
+								class_div = class_div + " style='background-color:#0211BB; border: 3px solid #FFFFFF;'>";
+							}
+							else if(train_class_table[i].id == 1102){  // Taroko
+								class_div = class_div + " style='background-color:#FF5D05; border: 3px solid #FFFFFF;'>";
+							}
+							else if(train_class_table[i].id == 1107){  // Puyuma
+								class_div = class_div + " style='background-color:#FF2400; border: 3px solid #FFFFFF;'>";
+							}
+							else if(train_class_table[i].id == 1110){  // Chu-Kuang
+								class_div = class_div + " style='background-color:#A86145;'>";
+							}
+							else if(train_class_table[i].id == 1120){  // Fu-Shing
+								class_div = class_div + " style='background-color:#019CD4;'>";
+							}
+							else{
+								class_div = class_div + ">";
+							}
+							
+							class_div = class_div + "<p class='big_p fulljustify'>"
+  							           + train_class_table[i].ZH
+									   + "</p><p class='normal_p fulljustify'>"
+									   + train_class_table[i].EN
+									   + "</p></div>";
+							break;
+						}
+					}
+					var dest_div;
+					for(i=0;i<station_table.length;i++){
+						if(station_table[i].id == parseInt(schedule['Dest'])){
+							dest_div = "<div class='col-md-3'><p class='big_p fulljustify'>"
+  							           + station_table[i].ZH
+									   + "</p><p class='normal_p text-center'>"
+									   + station_table[i].EN
+									   + "</p></div>";
+							break;
+						}
+					}
+					var train_div = "<div class='col-md-2' style='font-size:70px; line-height:90px;'>"
+  							         + schedule['Train'] 
+									 + "</div>";
+
 					$('#showcase').append(
-						"<div class='row schedule'><div class='col-md-3'>" + schedule['DEPTime'] 
-						+ "<\/div><div class='col-md-3'>" + car_class 
-						+ "<\/div><div class='col-md-4'>" + schedule['dest']
-						+ "<\/div><div class='col-md-2'>" + schedule['Train'] 
-						+ "<\/div><\/div>"
-					).fadeIn(100);
+						"<hr/><div class='row schedule'>"
+						+ depart_div
+						+ class_div 
+						+ dest_div
+						+ train_div 
+						+ "</div>"
+					).children(':last').hide().fadeIn();
 				});
-				setTimeout(AJAXsearch, 10000);
+				setTimeout(AJAXsearch, 30000);
 			}
 	    });
 		
 	}
+	
+	// when station changed, re-execute the AJAX search
+	$('#station_select').change(function() {
+		clearTimeout(AJAXsearch);
+		AJAXsearch();
+	});
 	
 	function timeUpdate(){
 		var now  = new Date();
@@ -83,33 +461,5 @@
 		setTimeout(timeUpdate, 1000);
 	}
 	
-	function classBlockHTML(classNum){
-		switch(classNum){
-			case '1100':
-			case '1101': 
-			case '1108':
-				return "自強 Tze-Chiang Limited Express";
-			case '1102': 
-				return "太魯閣 Taroko Limited Express";
-			case '1107': 
-				return "普悠瑪 Puyuma Limited Express";
-			case '1110':
-				return "莒光	Chu-Kuang Express";
-			case '1120':
-				return "復興	Fu-Hsing Semi Express";
-			case '1130':
-				return "電車	Electric Multiple Unit";
-			case '1131':
-				return "區間車 Local Train";
-			case '1132':
-				return "區間快 Fast Local Train";
-			case '1140':
-				return "普快車 Ordinary Train";
-			case '1141':
-				return "區間車 Disel Rail Car";
-			default:
-				return "自強 Tze-Chiang Limited Express";
-			}
-	}
   </script>
 </html>
