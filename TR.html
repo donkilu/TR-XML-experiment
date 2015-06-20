@@ -1,0 +1,115 @@
+<html>
+
+  <head>
+    <title>台鐵即時列車資訊</title>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+    <meta http-equiv="Content-Language" value="zh-TW" />
+    <link rel="icon" href="img/camo.ico" type="image/x-icon" />
+    <!-- Bootstrap core CSS & datepicker -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom styles -->
+    <link href="layout.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header clearfix">
+        <h3 class="text-muted">台鐵即時列車資訊</h3>
+		<div id="time_div"></div>
+      </div>
+	  
+	  <div class="marketing" id="showcase">
+		<div class="row" style="font-size: 26px;">
+			<div class="col-md-3">時間</div>
+			<div class="col-md-3">車種</div>
+			<div class="col-md-4">開往</div>
+			<div class="col-md-2">車次</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">DEPARTURE TIME</div>
+			<div class="col-md-3">TRAIN CLASS</div>
+			<div class="col-md-4">DESTINATION</div>
+			<div class="col-md-2">TRAIN NO.</div>
+		</div>
+	</div>
+		
+      <footer class="footer">
+        <p>&copy; Donki Lu 2015</p>
+      </footer>
+    </div>
+  </body>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+  <script src="jquery/jquery-1.11.2.min.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script language=javascript>
+	$(document).ready(function(){	//executed after the page has loaded
+		AJAXsearch();
+		timeUpdate();
+	});
+	
+	function AJAXsearch(){
+	    $.ajax({
+			type: 'POST',
+			url: 'php/analyzeXML.php',
+			data: { target: "1812" },
+			error: function(){
+				alert('AJAX request抓取資料失敗，請重新整理頁面');
+			},
+			success: function(JSONresponse){
+				$('#showcase schedule').remove();
+				$.each( JSONresponse, function(i, schedule){
+					var car_class = classBlockHTML(schedule['CarClass']);
+					$('#showcase').append(
+						"<div class='row schedule'><div class='col-md-3'>" + schedule['DEPTime'] 
+						+ "<\/div><div class='col-md-3'>" + car_class 
+						+ "<\/div><div class='col-md-4'>" + schedule['dest']
+						+ "<\/div><div class='col-md-2'>" + schedule['Train'] 
+						+ "<\/div><\/div>"
+					).fadeIn(100);
+				});
+				setTimeout(AJAXsearch, 10000);
+			}
+	    });
+		
+	}
+	
+	function timeUpdate(){
+		var now  = new Date();
+		var time = "現在時間" + now.toString();
+		$('#time_div').html(time);
+		setTimeout(timeUpdate, 1000);
+	}
+	
+	function classBlockHTML(classNum){
+		switch(classNum){
+			case '1100':
+			case '1101': 
+			case '1108':
+				return "自強 Tze-Chiang Limited Express";
+			case '1102': 
+				return "太魯閣 Taroko Limited Express";
+			case '1107': 
+				return "普悠瑪 Puyuma Limited Express";
+			case '1110':
+				return "莒光	Chu-Kuang Express";
+			case '1120':
+				return "復興	Fu-Hsing Semi Express";
+			case '1130':
+				return "電車	Electric Multiple Unit";
+			case '1131':
+				return "區間車 Local Train";
+			case '1132':
+				return "區間快 Fast Local Train";
+			case '1140':
+				return "普快車 Ordinary Train";
+			case '1141':
+				return "區間車 Disel Rail Car";
+			default:
+				return "自強 Tze-Chiang Limited Express";
+			}
+	}
+  </script>
+</html>
