@@ -369,6 +369,8 @@
 		}
 	};
 	
+	var AJAX_search_timer;
+	
 	function AJAXsearch(){
 	    $.ajax({
 			type: 'POST',
@@ -442,7 +444,7 @@
 						+ "</div>"
 					).children(':last').hide().fadeIn();
 				});
-				setTimeout(AJAXsearch, 30000);
+				AJAX_search_timer = setTimeout(AJAXsearch, 30000);
 			}
 	    });
 		
@@ -450,7 +452,7 @@
 	
 	// when station changed, re-execute the AJAX search
 	$('#station_select').change(function() {
-		clearTimeout(AJAXsearch);
+		clearTimeout(AJAX_search_timer);
 		AJAXsearch();
 	});
 	
