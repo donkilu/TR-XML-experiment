@@ -38,7 +38,7 @@
 	}
 	// sorting function (brilliant stackoverflow!)
 	function sortByOrder($a, $b) {
-		return $a['DEPTime'] - $b['DEPTime'];
+		return strtotime($a['DEPTime']) - strtotime($b['DEPTime']);
 	}
 	usort($schedule_array, 'sortByOrder');
 	// we only need last five schedules
