@@ -58,6 +58,6 @@
 	$zip->extractTo("$xml_dir");  
 	$zip->close();  
 	echo "<br>Unzipped file to: $xml_dir<br><br>";
-	Header("Location:'analyzeXML.php'");
+	Header("Location:analyzeXML.php");
 ?>
 </html>

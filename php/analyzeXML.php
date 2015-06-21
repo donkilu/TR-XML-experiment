@@ -10,7 +10,8 @@
 		$xml = simplexml_load_file($xml_dir) or die("Error: Cannot create object");
 	}
 	else{  // if xml file doesn't exist, go to download
-		header("Location:'downloadXML.php'");
+		header("Location:downloadXML.php");
+		exit();
 	}
 	// start to search available train schedules
 	$schedule_array = array();
