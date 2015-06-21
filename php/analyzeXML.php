@@ -14,7 +14,8 @@
 		exit();
 	}
 	// start to search available train schedules
-	$schedule_array = array();
+	$schedule_array_0 = array();
+	$schedule_array_1 = array();	
 	foreach($xml->children() as $traininfo){
 		// the simplexml method returns xml object, need (string) to transform into string.
 		$schedule = array(
@@ -36,15 +37,19 @@
 			}	
 			$schedule['Dest'] = (string)$timeinfo['Station'];
 		}
-		if($schedule['flag'])  array_push($schedule_array, $schedule);
+		if($schedule['flag']){
+			if($traininfo['LineDir'] == '0') array_push($schedule_array_0, $schedule);
+			else  array_push($schedule_array_1, $schedule);
+		}
 	}
 	// sorting function (brilliant stackoverflow!)
 	function sortByOrder($a, $b) {
 		return strtotime($a['DEPTime']) - strtotime($b['DEPTime']);
 	}
-	usort($schedule_array, 'sortByOrder');
+	usort($schedule_array_0, 'sortByOrder');
+	usort($schedule_array_1, 'sortByOrder');
 	// we only need last six schedules
-	$Last_six_array = array_slice($schedule_array, 0, 6);
+	$Last_six_array = array_merge( array_slice($schedule_array_0, 0, 3), array_slice($schedule_array_1, 0, 3));
 	header('Content-Type: application/json');
 	echo json_encode($Last_six_array);
 ?>

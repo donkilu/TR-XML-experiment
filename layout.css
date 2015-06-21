@@ -17,7 +17,7 @@ body {
 
 /* Custom page header */
 .header {
-  padding-bottom: 20px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #e5e5e5;
 }
 
@@ -38,10 +38,7 @@ body {
 
 /* Supporting marketing content */
 .marketing {
-  margin: 40px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
+  margin: 20px 0;
 }
 
 /* Responsive: Portrait tablets and up */
@@ -57,6 +54,13 @@ body {
   .header {
     margin-bottom: 30px;
   }
+}
+
+/* time div */
+
+#time_div {
+	font-size: 24px;
+	line-height: 40px;
 }
 
 /* schedule divs */
