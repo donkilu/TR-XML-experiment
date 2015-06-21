@@ -27,16 +27,18 @@
 	  
 	  <div class="marketing" id="showcase">
 		<div class="row" style="font-size: 25px;">
-			<div class="col-md-3">時間</div>
+			<div class="col-md-2">車次</div>
+			<div class="col-md-2">時間</div>
 			<div class="col-md-4">車種</div>
 			<div class="col-md-3">開往</div>
-			<div class="col-md-2">車次</div>
+			<div class="col-md-1">方向</div>
 		</div>
 		<div class="row">
-			<div class="col-md-3">DEPARTURE TIME</div>
+			<div class="col-md-2">TRAIN NO.</div>
+			<div class="col-md-2">DEPARTURE TIME</div>
 			<div class="col-md-4">TRAIN CLASS</div>
 			<div class="col-md-3">DESTINATION</div>
-			<div class="col-md-2">TRAIN NO.</div>
+			<div class="col-md-1">DIRECTION</div>
 		</div>
 	</div>
 		
@@ -387,15 +389,19 @@
 				$('#showcase hr').fadeOut();
 				$('#showcase .schedule').remove();
 				$('#showcase hr').remove();
-				$.each( JSONresponse, function(i, schedule){
+				$.each( JSONresponse, function(i, schedule){	
+					var train_div = "<div class='col-md-2' style='font-size:65px; line-height:90px;'>"
+  							         + schedule['Train'] 
+									 + "</div>";				
 					var depart_time = schedule['DEPTime'].split(":");
-					var depart_div = "<div class='col-md-3' style='font-size:70px; line-height:90px;'>"
+					var depart_div = "<div class='col-md-2' style='font-size:65px; line-height:90px;'>"
 								     + depart_time[0] + ":" + depart_time[1]
 								     + "<\/div>"; 
 					var class_div;
 					for(i=0;i<train_class_table.length;i++){
 						if(train_class_table[i].id == parseInt(schedule['CarClass'])){
 							class_div = "<div class='col-md-4'";
+							// coloring
 							if(train_class_table[i].id == 1100 || train_class_table[i].id == 1101 || train_class_table[i].id == 1108){  // Tse-Chiang
 								class_div = class_div + " style='background-color:#0211BB; border: 3px solid #FFFFFF;'>";
 							}
@@ -414,7 +420,6 @@
 							else{
 								class_div = class_div + ">";
 							}
-							
 							class_div = class_div + "<p class='big_p fulljustify'>"
   							           + train_class_table[i].ZH
 									   + "</p><p class='normal_p fulljustify'>"
@@ -434,16 +439,21 @@
 							break;
 						}
 					}
-					var train_div = "<div class='col-md-2' style='font-size:70px; line-height:90px;'>"
-  							         + schedule['Train'] 
-									 + "</div>";
+					var dir_text;
+					if(schedule['Dir'] == '0')  dir_text = "順";
+					else                        dir_text = "逆";
+					var dir_div = "<div class='col-md-1' style='font-size:65px; line-height:90px; font-weight: bold;"
+					if(schedule['Dir'] == '0')  dir_div  = dir_div + " color:#FF2400;'>順";
+					else                        dir_div  = dir_div + " color:#0211BB;'>逆";
+					dir_div = dir_div + "<\/div>";
 
 					$('#showcase').append(
 						"<hr/><div class='row schedule'>"
-						+ depart_div
-						+ class_div 
-						+ dest_div
-						+ train_div 
+						+ train_div
+						+ depart_div 
+						+ class_div
+						+ dest_div 
+						+ dir_div
 						+ "</div>"
 					).children(':last').hide().fadeIn();
 				});

@@ -57,10 +57,6 @@ body {
   .header {
     margin-bottom: 30px;
   }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
 }
 
 /* schedule divs */
@@ -70,13 +66,15 @@ p {
 }
 
 .normal_p {
-	padding-right: 20%;
+	padding-left: 10%;
+	padding-right: 10%;
 	font-size: 20px;
 	line-height: 35px;
 }
 
 .big_p {
-	padding-right: 20%;
+	padding-left: 10%;
+	padding-right: 10%;
 	font-size: 45px;
 	line-height: 55px;
 	font-weight: bold;

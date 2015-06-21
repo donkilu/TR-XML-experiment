@@ -22,6 +22,7 @@
 			'CarClass' => (string)$traininfo['CarClass'],
 			'DEPTime'  => '',
 			'Dest'     => '',
+			'Dir'      => (string)$traininfo['LineDir'],
 			'flag'     => false
 		);
 		foreach($traininfo->children() as $timeinfo){
@@ -42,8 +43,8 @@
 		return strtotime($a['DEPTime']) - strtotime($b['DEPTime']);
 	}
 	usort($schedule_array, 'sortByOrder');
-	// we only need last five schedules
-	$Last_five_array = array_slice($schedule_array, 0, 5);
+	// we only need last six schedules
+	$Last_six_array = array_slice($schedule_array, 0, 6);
 	header('Content-Type: application/json');
-	echo json_encode($Last_five_array);
+	echo json_encode($Last_six_array);
 ?>
