@@ -9,13 +9,14 @@
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Custom styles -->
     <link href="layout.css" rel="stylesheet" />
-  </head>
+	<!-- Google Fonts -->
+	<link href='http://fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'>
+</head>
 
   <body>
     <div class="container">
       <div class="header clearfix">
         <div class="col-md-9">
-			<h3 class="text-muted">台鐵今日列車資訊</h3>
 			<div id="time_div"></div>
 		</div>
 		<div class="form-group col-md-3">
@@ -26,19 +27,35 @@
       </div>
 	  
 	  <div class="marketing" id="showcase">
-		<div class="row" style="font-size: 25px;">
-			<div class="col-md-2">車次</div>
-			<div class="col-md-2">時間</div>
-			<div class="col-md-4">車種</div>
-			<div class="col-md-3">開往</div>
-			<div class="col-md-1">方向</div>
+		<div class="row dir_text_div" style="background-color: #FF2400; margin-bottom: 10px;">順行</div>
+		<div class="row" style="font-size: 20px;">
+			<div class="col-xs-2 col-md-2 text-center">車次</div>
+			<div class="col-xs-2 col-md-2 text-center">時間</div>
+			<div class="col-xs-4 col-md-4 text-center">車種</div>
+			<div class="col-xs-4 col-md-4 text-center">開往</div>
 		</div>
 		<div class="row">
-			<div class="col-md-2">TRAIN NO.</div>
-			<div class="col-md-2">DEPARTURE TIME</div>
-			<div class="col-md-4">TRAIN CLASS</div>
-			<div class="col-md-3">DESTINATION</div>
-			<div class="col-md-1">DIRECTION</div>
+			<div class="col-xs-2 col-md-2 text-center">TRAIN NO.</div>
+			<div class="col-xs-2 col-md-2 text-center">DEPARTURE TIME</div>
+			<div class="col-xs-4 col-md-4 text-center">TRAIN CLASS</div>
+			<div class="col-xs-4 col-md-4 text-center">DESTINATION</div>
+		</div>
+		<div id="clockwise">
+		</div>
+		<div class="row dir_text_div" style="background-color: #0211BB; margin-top: 20px; margin-bottom: 10px;">逆行</div>
+		<div class="row" style="font-size: 20px;">
+			<div class="col-xs-2 col-md-2 text-center">車次</div>
+			<div class="col-xs-2 col-md-2 text-center">時間</div>
+			<div class="col-xs-4 col-md-4 text-center">車種</div>
+			<div class="col-xs-4 col-md-4 text-center">開往</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-2 col-md-2 text-center">TRAIN NO.</div>
+			<div class="col-xs-2 col-md-2 text-center">DEPARTURE TIME</div>
+			<div class="col-xs-4 col-md-4 text-center">TRAIN CLASS</div>
+			<div class="col-xs-4 col-md-4 text-center">DESTINATION</div>
+		</div>
+		<div id="counterclockwise">
 		</div>
 	</div>
 		
@@ -405,20 +422,20 @@
 				$('#showcase .schedule').remove();
 				$('#showcase hr').remove();
 				$.each( JSONresponse, function(counter, schedule){	
-					var train_div = "<div class='col-md-2' style='font-size:65px; line-height:90px;'>"
+					var train_div = "<div class='col-xs-2 col-md-2' style='font-size:65px; line-height:90px;'>"
   							         + schedule['Train'] 
 									 + "</div>";				
 					
+					var depart_div;
 					var depart_time = schedule['DEPTime'].split(":");
-					var depart_div = "<div class='col-md-2' style='font-size:65px; line-height:90px;'>";
-					if($('#station_select').val() == parseInt(schedule['Dest']) ) depart_div = depart_div + "-";  // target is this train's last station
-					else depart_div = depart_div + depart_time[0] + ":" + depart_time[1];
-					depart_div = depart_div + "<\/div>"; 
+					if(check_5_min(schedule['DEPTime'])) depart_div = "<div class='col-xs-2 col-md-2 time_close'";
+					else depart_div = "<div class='col-xs-2 col-md-2'";
+					depart_div = depart_div + " style='font-size:65px; line-height:90px;'>" + depart_time[0] + ":" + depart_time[1] + "<\/div>"; 
 					
 					var class_div;
 					for(i=0;i<train_class_table.length;i++){
 						if(train_class_table[i].id == parseInt(schedule['CarClass'])){
-							class_div = "<div class='col-md-4'";
+							class_div = "<div class='col-xs-4 col-md-4'";
 							// coloring
 							if(train_class_table[i].id == 1100 || train_class_table[i].id == 1101 || train_class_table[i].id == 1108){  // Tse-Chiang
 								class_div = class_div + " style='background-color:#0211BB; border: 3px solid #FFFFFF;'>";
@@ -450,7 +467,7 @@
 					var dest_div;
 					for(i=0;i<station_table.length;i++){
 						if(station_table[i].id == parseInt(schedule['Dest'])){
-							dest_div = "<div class='col-md-3'><p class='big_p fulljustify'>"
+							dest_div = "<div class='col-xs-4 col-md-4'><p class='big_p fulljustify'>"
   							           + station_table[i].ZH
 									   + "</p><p class='normal_p text-center'>"
 									   + station_table[i].EN
@@ -458,22 +475,29 @@
 							break;
 						}
 					}
-					
-					var dir_div = "<div class='col-md-1' style='font-size:65px; line-height:90px; font-weight: bold;"
-					if(schedule['Dir'] == '0')  dir_div  = dir_div + " color:#FF2400;'>順";
-					else                        dir_div  = dir_div + " color:#0211BB;'>逆";
-					dir_div = dir_div + "<\/div>";
-					
-					$('#showcase').append(
-						"<hr/><div class='row schedule'>"
-						+ train_div
-						+ depart_div 
-						+ class_div
-						+ dest_div 
-						+ dir_div
-						+ "</div>"
-					).children(':last').hide().fadeIn();
+										
+					if(schedule['Dir'] == '0'){
+						$('#clockwise').append(
+							"<hr/><div class='row schedule'>"
+							+ train_div
+							+ depart_div 
+							+ class_div
+							+ dest_div 
+							+ "</div>"
+						).children(':last').hide().fadeIn();
+					}
+					else{
+						$('#counterclockwise').append(
+							"<hr/><div class='row schedule'>"
+							+ train_div
+							+ depart_div 
+							+ class_div
+							+ dest_div 
+							+ "</div>"
+						).children(':last').hide().fadeIn();
+					}
 				});
+				// update the schedule every 30 seconds
 				AJAX_search_timer = setTimeout(AJAXsearch, 30000);
 			}
 	    });
@@ -486,12 +510,36 @@
 		AJAXsearch();
 	});
 	
+	function check_5_min(depart_time){
+		var time_split = depart_time.split(":");
+		var hour   = parseInt(time_split[0]);
+		var minute = parseInt(time_split[1]);
+		var now = new Date();
+		var hour_distance = hour - now.getHours();
+		if(hour_distance == 0){  // the same hour
+			if(minute - now.getMinutes() <= 5)  return true;
+			else return false;
+		}
+		else if(hour_distance == 1){ // the schedule is faster than one hour
+			var minute_distance = (60-now.getMinutes) + minute;
+			if(minute_distance <= 5)  return true;
+			else return false;
+		}
+		else return false;
+	}
+
 	function timeUpdate(){
 		var now  = new Date();
-		var time = now.toLocaleString();
+		var time = now.toTimeString().slice(0,8);
 		$('#time_div').html(time);
 		setTimeout(timeUpdate, 1000);
 	}
 	
+	function blinker() {
+		$('.time_close').fadeOut(1000).fadeIn(1000);
+	}
+	
+	setInterval(blinker, 2000);
+
   </script>
 </html>

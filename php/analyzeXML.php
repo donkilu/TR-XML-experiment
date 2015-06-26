@@ -37,7 +37,8 @@
 			}	
 			$schedule['Dest'] = (string)$timeinfo['Station'];
 		}
-		if($schedule['flag']){
+		// filter out non-stops & terminal stop trains
+		if($schedule['flag'] && $schedule['Dest'] != $target){
 			if($traininfo['LineDir'] == '0') array_push($schedule_array_0, $schedule);
 			else  array_push($schedule_array_1, $schedule);
 		}

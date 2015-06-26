@@ -2,7 +2,7 @@
 body {
   padding-top: 20px;
   padding-bottom: 20px;
-  font-family: Microsoft Jhenghei, Heiti TC, Source Han Sans, Arial;
+  font-family: Microsoft Jhenghei, Heiti TC, Source Han Sans, Arial, sans-serif;
   background-color: #000000;
   color: #FFFFFF;
 }
@@ -59,8 +59,9 @@ body {
 /* time div */
 
 #time_div {
-	font-size: 24px;
-	line-height: 40px;
+	font-family: 'Roboto', sans-serif;
+	font-size: 60px;
+	line-height: 74px;
 }
 
 /* schedule divs */
@@ -89,10 +90,23 @@ p {
 	line-height: 15px;
 }
 
+.dir_text_div{
+	font-size: 40px;
+	line-height: 60px;
+	padding-left: 10px;
+	font-weight: bold;
+	border-bottom-right-radius: 90px;
+}
+
+.time_close {
+	color: #FF0000;
+}
+
 /* justify */
 
 .fulljustify {
   text-align: justify;
+  text-justify: inter-word;
 }
 .fulljustify:after {
   content: "";
