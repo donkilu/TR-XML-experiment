@@ -18,6 +18,7 @@
       <div class="header clearfix">
         <div class="col-md-9">
 			<div id="time_div"></div>
+			<audio id="Player" onended="go()"></audio>
 		</div>
 		<div class="form-group col-md-3">
 			<label for="station">車站</label>
@@ -73,19 +74,19 @@
   <script language=javascript>
     // train class translation table
 	var train_class_table = [];
-	train_class_table.push({id:1100, ZH:"自強", EN:"Tze-Chiang Limited Express"});
-	train_class_table.push({id:1101, ZH:"自強", EN:"Tze-Chiang Limited Express"});
-	train_class_table.push({id:1108, ZH:"自強", EN:"Tze-Chiang Limited Express"});
-	train_class_table.push({id:1102, ZH:"太魯閣", EN:"Taroko Limited Express"});
-	train_class_table.push({id:1107, ZH:"普悠瑪", EN:"Puyuma Limited Express"});
-	train_class_table.push({id:1110, ZH:"莒光", EN:"Chu-Kuang Express"});
-	train_class_table.push({id:1120, ZH:"復興", EN:"Fu-Hsing Semi Express"});
-	train_class_table.push({id:1130, ZH:"電車", EN:"Electric Multiple Unit"});
-	train_class_table.push({id:1131, ZH:"區間車", EN:"Local Train"});
-	train_class_table.push({id:1132, ZH:"區間快", EN:"Fast Local Train"});
-	train_class_table.push({id:1140, ZH:"普快車", EN:"Ordinary Train"});
-	train_class_table.push({id:1141, ZH:"柴快車", EN:"Disel Rail Car"});
-	train_class_table.push({id:1150, ZH:"柴油車", EN:"N/A"});
+	train_class_table.push({id:1100, ZH:"自強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
+	train_class_table.push({id:1101, ZH:"自強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
+	train_class_table.push({id:1108, ZH:"自強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
+	train_class_table.push({id:1102, ZH:"太魯閣", EN:"Taroko Limited Express", VOICETYPE:'O'});
+	train_class_table.push({id:1107, ZH:"普悠瑪", EN:"Puyuma Limited Express", VOICETYPE:'P'});
+	train_class_table.push({id:1110, ZH:"莒光", EN:"Chu-Kuang Express", VOICETYPE:'B'});
+	train_class_table.push({id:1120, ZH:"復興", EN:"Fu-Hsing Semi Express", VOICETYPE:'C'});
+	train_class_table.push({id:1130, ZH:"電車", EN:"Electric Multiple Unit", VOICETYPE:'H'});
+	train_class_table.push({id:1131, ZH:"區間車", EN:"Local Train", VOICETYPE:'L'});
+	train_class_table.push({id:1132, ZH:"區間快", EN:"Fast Local Train", VOICETYPE:'M'});
+	train_class_table.push({id:1140, ZH:"普快車", EN:"Ordinary Train", VOICETYPE:'N'});
+	train_class_table.push({id:1141, ZH:"柴快車", EN:"Disel Rail Car", VOICETYPE:'E'});
+	train_class_table.push({id:1150, ZH:"柴油車", EN:"N/A", VOICETYPE:'N/A'});
 
 	// station translation table
 	var station_table = [];
@@ -428,7 +429,10 @@
 					
 					var depart_div;
 					var depart_time = schedule['DEPTime'].split(":");
-					if(check_5_min(schedule['DEPTime'])) depart_div = "<div class='col-xs-2 col-md-2 time_close'";
+					if(check_5_min(schedule['DEPTime'])){
+						depart_div = "<div class='col-xs-2 col-md-2 time_close'";
+						go(schedule, true);
+					}
 					else depart_div = "<div class='col-xs-2 col-md-2'";
 					depart_div = depart_div + " style='font-size:65px; line-height:90px;'>" + depart_time[0] + ":" + depart_time[1] + "<\/div>"; 
 					
@@ -521,7 +525,7 @@
 			else return false;
 		}
 		else if(hour_distance == 1){ // the schedule is faster than one hour
-			var minute_distance = (60-now.getMinutes) + minute;
+			var minute_distance = (60-now.getMinutes()) + minute;
 			if(minute_distance <= 5)  return true;
 			else return false;
 		}
@@ -540,6 +544,50 @@
 	}
 	
 	setInterval(blinker, 2000);
+
+	var process_i = 0;
+	var train_num_i = 0;
+	var trigger = false;
+	var train_num;
+	var train_type;
+	
+	function go(input_schedule, input_trigger) {
+		if(input_trigger){
+			trigger = true;
+			train_num  = input_schedule['Train'];
+			train_type = input_schedule['CarClass'];
+		}
+		if(trigger){
+			if(train_num_i < train_num.length){
+				document.getElementById('Player').src = "train_voice/TIDS_Number/TIDS_00" + train_num.charAt(train_num_i) + "_C.wav";			
+				document.getElementById('Player').play();
+				++train_num_i;
+			}
+			else if(process_i == 0){  // 次
+				document.getElementById('Player').src = "train_voice/TIDS_TrainID_c.wav";			
+				document.getElementById('Player').play();
+				++process_i;
+			}
+			else if(process_i == 1){  // 車種
+				for(i=0;i<train_class_table.length;i++){
+					if(train_class_table[i].id == parseInt(train_type)){
+						document.getElementById('Player').src = "train_voice/TIDS_TrainType/TIDS_Ttype" + train_class_table[i].VOICETYPE + "_C.wav";			
+						document.getElementById('Player').play();
+						++process_i;			
+						break;
+					}
+				}
+			}
+			else{  // 要開了
+				document.getElementById('Player').src = "train_voice/TIDS_Launching1_c.wav";			
+				document.getElementById('Player').play();
+				// reset trigger & counters
+				trigger = false;
+				train_num_i = 0;		
+				process_i = 0;
+			}
+		}
+	}
 
   </script>
 </html>
