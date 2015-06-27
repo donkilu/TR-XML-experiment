@@ -155,11 +155,12 @@
 	station_table.push({id:1315, ZH:"后里", EN:"Houli"});
 	station_table.push({id:1317, ZH:"豐原", EN:"Fongyuan"});
 	station_table.push({id:1318, ZH:"潭子", EN:"Tanzih"});
-	station_table.push({id:1319, ZH:"烏日", EN:"Wuri"});
-	station_table.push({id:1321, ZH:"成功", EN:"Chenggong"});
-	station_table.push({id:1322, ZH:"大慶", EN:"Daqing"});
 	station_table.push({id:1323, ZH:"太原", EN:"Taiyuan"});
+	station_table.push({id:1319, ZH:"台中", EN:"Taichung"});	
+	station_table.push({id:1322, ZH:"大慶", EN:"Daqing"});
+	station_table.push({id:1320, ZH:"烏日", EN:"Wuri"});
 	station_table.push({id:1324, ZH:"新烏日", EN:"Xinwuri"});
+	station_table.push({id:1321, ZH:"成功", EN:"Chenggong"});
 	// 縱貫線南段
 	station_table.push({id:0004, ZH:"=====縱貫線南段=====", EN:""});  //標記用
 	station_table.push({id:1120, ZH:"彰化", EN:"Changhua"});
@@ -545,46 +546,62 @@
 	
 	setInterval(blinker, 2000);
 
-	var process_i = 0;
+	var stage_i = 0;
 	var train_num_i = 0;
 	var trigger = false;
 	var train_num;
 	var train_type;
+	var waiting_timer;
 	
 	function go(input_schedule, input_trigger) {
-		if(input_trigger){
-			trigger = true;
-			train_num  = input_schedule['Train'];
-			train_type = input_schedule['CarClass'];
+		
+		if(input_trigger){  // initiative
+			clearTimeout(waiting_timer);
+			if(trigger == true){  // already playing...				
+				waiting_timer = setTimeout( function(){ go(input_schedule, input_trigger) }, 100 );  // loop until previous train's last stage
+				return;
+			}
+			else{                 // start playing or previous train's last stage
+				trigger = true;
+				train_num  = input_schedule['Train'];
+				train_type = input_schedule['CarClass'];
+			}
 		}
+		
 		if(trigger){
 			if(train_num_i < train_num.length){
 				document.getElementById('Player').src = "train_voice/TIDS_Number/TIDS_00" + train_num.charAt(train_num_i) + "_C.wav";			
 				document.getElementById('Player').play();
 				++train_num_i;
 			}
-			else if(process_i == 0){  // 次
+			else if(stage_i == 0){  // 次
 				document.getElementById('Player').src = "train_voice/TIDS_TrainID_c.wav";			
 				document.getElementById('Player').play();
-				++process_i;
+				++stage_i;
 			}
-			else if(process_i == 1){  // 車種
+			else if(stage_i == 1){  // 車種
 				for(i=0;i<train_class_table.length;i++){
 					if(train_class_table[i].id == parseInt(train_type)){
 						document.getElementById('Player').src = "train_voice/TIDS_TrainType/TIDS_Ttype" + train_class_table[i].VOICETYPE + "_C.wav";			
 						document.getElementById('Player').play();
-						++process_i;			
+						++stage_i;			
 						break;
 					}
 				}
 			}
-			else{  // 要開了
+			else if(stage_i == 2){  // 要開了
 				document.getElementById('Player').src = "train_voice/TIDS_Launching1_c.wav";			
+				document.getElementById('Player').play();
+				++stage_i;
+			}
+
+			else{  // 請趕快上車
+				document.getElementById('Player').src = "train_voice/TIDS_End_c.wav";			
 				document.getElementById('Player').play();
 				// reset trigger & counters
 				trigger = false;
 				train_num_i = 0;		
-				process_i = 0;
+				stage_i = 0;
 			}
 		}
 	}
