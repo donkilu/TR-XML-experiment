@@ -521,7 +521,8 @@
 		var time_split = depart_time.split(":");
 		var hour   = parseInt(time_split[0]);
 		var minute = parseInt(time_split[1]);
-		var now = new Date();
+		var pre_now = new Date();
+		var now  = new Date( pre_now.valueOf() + pre_now.getTimezoneOffset()*60*1000 + 8*60*60*1000);  // set time to be GMT+8
 		var hour_distance = hour - now.getHours();
 		if(hour_distance == 0){  // the same hour
 			if(minute - now.getMinutes() <= 5)  return true;
@@ -536,7 +537,8 @@
 	}
 
 	function timeUpdate(){
-		var now  = new Date();
+		var pre_now = new Date();
+		var now  = new Date( pre_now.valueOf() + pre_now.getTimezoneOffset()*60*1000 + 8*60*60*1000);  // set time to be GMT+8
 		var time = now.toTimeString().slice(0,8);
 		$('#time_div').html(time);
 		setTimeout(timeUpdate, 1000);
