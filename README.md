@@ -10,6 +10,8 @@ Please see http://donkilu.github.io/TRA_realtime_schedule for more information a
 
 1.  Install php. For Debian/Ubuntu, you might need to install from ppa:ondrej/php.
 
+    apt install php php-xml php-curl
+
 1.  Run php server at repo root:
 
     php -S 127.0.0.1:8000
