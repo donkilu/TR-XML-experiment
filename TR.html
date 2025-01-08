@@ -1,7 +1,7 @@
 <html>
 
   <head>
-    <title>台鐵今日列車資訊</title>
+    <title>台鐵車站時刻表</title>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
     <meta http-equiv="Content-Language" value="zh-TW" />
     <link rel="icon" href="img/TRA_logo.ico" type="image/x-icon" />
@@ -28,40 +28,16 @@
       </div>
       
       <div class="marketing" id="showcase">
-        <div class="row dir_text_div" style="background-color: #FF2400; margin-bottom: 10px;">順行</div>
-        <div class="row" style="font-size: 20px;">
-            <div class="col-xs-2 col-md-2 text-center">車次</div>
-            <div class="col-xs-2 col-md-2 text-center">時間</div>
-            <div class="col-xs-4 col-md-4 text-center">車種</div>
-            <div class="col-xs-4 col-md-4 text-center">開往</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-2 col-md-2 text-center">TRAIN NO.</div>
-            <div class="col-xs-2 col-md-2 text-center">DEPARTURE TIME</div>
-            <div class="col-xs-4 col-md-4 text-center">TRAIN CLASS</div>
-            <div class="col-xs-4 col-md-4 text-center">DESTINATION</div>
-        </div>
+        <div class="row dir_text_div" style="background-color: #CB4042; margin-bottom: 10px;">順行</div>
         <div id="clockwise">
         </div>
-        <div class="row dir_text_div" style="background-color: #0211BB; margin-top: 20px; margin-bottom: 10px;">逆行</div>
-        <div class="row" style="font-size: 20px;">
-            <div class="col-xs-2 col-md-2 text-center">車次</div>
-            <div class="col-xs-2 col-md-2 text-center">時間</div>
-            <div class="col-xs-4 col-md-4 text-center">車種</div>
-            <div class="col-xs-4 col-md-4 text-center">開往</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-2 col-md-2 text-center">TRAIN NO.</div>
-            <div class="col-xs-2 col-md-2 text-center">DEPARTURE TIME</div>
-            <div class="col-xs-4 col-md-4 text-center">TRAIN CLASS</div>
-            <div class="col-xs-4 col-md-4 text-center">DESTINATION</div>
-        </div>
+        <div class="row dir_text_div" style="background-color: #0D5661; margin-top: 20px; margin-bottom: 10px;">逆行</div>
         <div id="counterclockwise">
         </div>
     </div>
         
       <footer class="footer">
-        <p>&copy; Donki Lu 2015</p>
+        <p>&copy; Donki Lu 2025</p>
       </footer>
     </div>
   </body>
@@ -111,8 +87,8 @@
     train_class_table.push({id:"110E", ZH:"自 強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
     train_class_table.push({id:"110F", ZH:"自 強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
     train_class_table.push({id:"1106", ZH:"自 強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
-    train_class_table.push({id:"110G", ZH:"自 強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
-    train_class_table.push({id:"110H", ZH:"自 強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});
+    train_class_table.push({id:"110G", ZH:"自 強 3000", EN:"EMU3000 Limited Express", VOICETYPE:'A'});
+    train_class_table.push({id:"110H", ZH:"自 強 3000", EN:"EMU3000 Limited Express", VOICETYPE:'A'});
     train_class_table.push({id:"110K", ZH:"自 強", EN:"Tze-Chiang Limited Express", VOICETYPE:'A'});  // Not in manual
 
     // station translation table
@@ -433,23 +409,27 @@
     //station_table.push({id:4202, ZH:"東港支線", EN:"N/A"});
     //station_table.push({id:4302, ZH:"東南支線", EN:"N/A"});
 
-    
-    
-    $(document).ready(function(){    //executed after the page has loaded
+    $(document).ready(function()
+    {
+        // Execute once the page is loaded
         addStation();
         AJAXsearch();
         timeUpdate();
     });
     
-    function addStation(){
-        var default_station = 1812;
-        for(i=0;i<station_table.length;i++){
-            if(station_table[i].id == default_station){
+    function addStation()
+    {
+        var default_station = 1000;  // 台北
+        for (i = 0; i < station_table.length; i++)
+        {
+            if (station_table[i].id == default_station)
+            {
                 $('#station_select').append(
                     "<option value=" + station_table[i].id + " selected>" + station_table[i].ZH + "</option>"
                 );
             }
-            else{ 
+            else
+            {
                 $('#station_select').append(
                     "<option value=" + station_table[i].id + ">" + station_table[i].ZH + "</option>"
                 );
@@ -464,13 +444,12 @@
             type: 'POST',
             url: 'php/analyzeXML.php',
             data: { target: $('#station_select').val() },
-            error: function(){
+            error: function()
+            {
                 alert('AJAX request抓取資料失敗，請重新整理頁面');
             },
-            success: function(JSONresponse){
-                console.log("Hey");
-                console.log(JSON.stringify(JSONresponse));
-
+            success: function(JSONresponse)
+            {
                 $('#showcase .schedule').fadeOut();
                 $('#showcase hr').fadeOut();
                 $('#showcase .schedule').remove();
@@ -496,30 +475,41 @@
                         if(train_class_table[i].id == schedule['CarClass'])
                         {
                             class_div = "<div class='col-xs-4 col-md-4'";
-                            // coloring
-                            if (train_class_table[i].ZH == "自 強")  // Tse-Chiang
+                            // coloring: from https://color-term.com/traditional-color-of-japan
+                            if (train_class_table[i].ZH == "自 強")
                             {
-                                class_div = class_div + " style='background-color:#0211BB; border: 3px solid #FFFFFF;'>";
+                                // 藍 Ai
+                                class_div = class_div + " style='background-color:#0D5661; border: 3px solid #FFFFFF;'>";
                             }
-                            else if (train_class_table[i].ZH == "太 魯 閣")  // Taroko
+                            else if (train_class_table[i].ZH == "自 強 3000")
                             {
-                                class_div = class_div + " style='background-color:#FF5D05; border: 3px solid #FFFFFF;'>";
+                                // 琉璃紺 Rurikon
+                                class_div = class_div + " style='background-color:#0B346E; border: 3px solid #FFFFFF;'>";
                             }
-                            else if (train_class_table[i].ZH == "普 悠 瑪")  // Puyuma
+                            else if (train_class_table[i].ZH == "太 魯 閣")
                             {
-                                class_div = class_div + " style='background-color:#FF2400; border: 3px solid #FFFFFF;'>";
+                                // 紅鬱金 Beniukon
+                                class_div = class_div + " style='background-color:#E98B2A; border: 3px solid #FFFFFF;'>";
                             }
-                            else if (train_class_table[i].ZH == "莒 光")  // Chu-Kuang
+                            else if (train_class_table[i].ZH == "普 悠 瑪")
                             {
-                                class_div = class_div + " style='background-color:#FF5D05;'>";
+                                // 赤紅 Akabeni
+                                class_div = class_div + " style='background-color:#CB4042; border: 3px solid #FFFFFF;'>";
                             }
-                            else if (train_class_table[i].ZH == "復 興")  // Fu-Shing
+                            else if (train_class_table[i].ZH == "莒 光")
                             {
-                                class_div = class_div + " style='background-color:#019CD4;'>";
+                                // 鬱金 Ukon
+                                class_div = class_div + " style='background-color:#EFBB24;'>";
+                            }
+                            else if (train_class_table[i].ZH == "復 興")
+                            {
+                                // 新橋 Shinbashi
+                                class_div = class_div + " style='background-color:#0089A7;'>";
                             }
                             else
                             {
-                                class_div = class_div + ">";
+                                // 常磐 Tokiwa
+                                class_div = class_div + " style='background-color:#1B813E;'>";
                             }
                             class_div = class_div + "<p class='big_p fulljustify'>"
                                          + train_class_table[i].ZH
@@ -531,8 +521,10 @@
                     }
                     
                     var dest_div;
-                    for(i=0;i<station_table.length;i++){
-                        if(station_table[i].id == parseInt(schedule['Dest'])){
+                    for (i = 0; i < station_table.length; i++)
+                    {
+                        if (station_table[i].id == parseInt(schedule['Dest']))
+                        {
                             dest_div = "<div class='col-xs-4 col-md-4'><p class='big_p fulljustify'>"
                                          + station_table[i].ZH
                                        + "</p><p class='normal_p text-center'>"
@@ -541,37 +533,37 @@
                             break;
                         }
                     }
-                                        
-                    if(schedule['Dir'] == '1')
+
+                    if (schedule['Dir'] == '1')
                     {
                         $('#clockwise').append(
-                            "<hr/><div class='row schedule'>"
+                            "<div class='row schedule'>"
                             + train_div
                             + depart_div 
                             + class_div
                             + dest_div 
-                            + "</div>"
+                            + "</div><hr/>"
                         ).children(':last').hide().fadeIn();
                     }
                     else
                     {
                         $('#counterclockwise').append(
-                            "<hr/><div class='row schedule'>"
+                            "<div class='row schedule'>"
                             + train_div
                             + depart_div 
                             + class_div
                             + dest_div 
-                            + "</div>"
+                            + "</div><hr/>"
                         ).children(':last').hide().fadeIn();
                     }
                 });
+
                 // update the schedule every 30 seconds
                 AJAX_search_timer = setTimeout(AJAXsearch, 30000);
             }
         });
-        
     }
-    
+
     // when station changed, re-execute the AJAX search
     $('#station_select').change(function()
     {
@@ -585,17 +577,17 @@
         var hour   = parseInt(time_split[0]);
         var minute = parseInt(time_split[1]);
         var pre_now = new Date();
-        var now  = new Date( pre_now.valueOf() + pre_now.getTimezoneOffset()*60*1000 + 8*60*60*1000);  // set time to be GMT+8
+        var now  = new Date(pre_now.valueOf() + pre_now.getTimezoneOffset()*60*1000 + 8*60*60*1000);  // set time to be GMT+8
         var hour_distance = hour - now.getHours();
         if (hour_distance == 0)  // the same hour
         {
-            if(minute - now.getMinutes() <= 5)  return true;
+            if (minute - now.getMinutes() <= 5)  return true;
             else return false;
         }
         else if (hour_distance == 1)  // the schedule is faster than one hour
         {
             var minute_distance = (60-now.getMinutes()) + minute;
-            if(minute_distance <= 5)  return true;
+            if (minute_distance <= 5)  return true;
             else return false;
         }
         else return false;
@@ -619,34 +611,37 @@
 
     var stage_i = 0;
     var train_num_i = 0;
-    var trigger = false;
+    var is_playing = false;
     var train_num;
     var train_type;
-    var waiting_timer;
-    
+    var pending_trains = new Set();
     function go(input_schedule, input_trigger)
     {
-        if (input_trigger)  // initiative
+        // Note: Here we assume that the max number of overlapping train requests is 2.
+        // Such assumption is based on TRA's scheduling policy.
+
+        if (input_trigger)  // check if this is a new train audio request
         {
-            clearTimeout(waiting_timer);
-            if (trigger == true)  // already playing...
+            if (is_playing)  // Prev train audio is still playing... need to wait
             {
-                waiting_timer = setTimeout( function(){ go(input_schedule, input_trigger) }, 100 );  // loop until previous train's last stage
+                pending_trains.add(input_schedule['Train']);
+                setTimeout( function(){ go(input_schedule, input_trigger) }, 500 );  // Check again after 0.5s
                 return;
             }
-            else  // start playing or previous train's last stage
+            else  // start playing curr train audio
             {
-                trigger = true;
+                pending_trains.delete(input_schedule['Train']);
+                is_playing = true;
                 train_num  = input_schedule['Train'];
                 train_type = input_schedule['CarClass'];
             }
         }
         
-        if (trigger)
+        if (is_playing)
         {
-            if (train_num_i < train_num.length)
+            if (train_num_i < train_num.length)  // 數字
             {
-                document.getElementById('Player').src = "train_voice/TIDS_Number/TIDS_00" + train_num.charAt(train_num_i) + "_C.wav";            
+                document.getElementById('Player').src = "train_voice/TIDS_Number/TIDS_00" + train_num.charAt(train_num_i) + "_C.wav";
                 document.getElementById('Player').play();
                 ++train_num_i;
             }
@@ -660,29 +655,42 @@
             {
                 for (i = 0; i < train_class_table.length; i++)
                 {
-                    if (train_class_table[i].id == parseInt(train_type))
+                    if (train_class_table[i].id == train_type)
                     {
-                        document.getElementById('Player').src = "train_voice/TIDS_TrainType/TIDS_Ttype" + train_class_table[i].VOICETYPE + "_C.wav";            
+                        document.getElementById('Player').src = "train_voice/TIDS_TrainType/TIDS_Ttype" + train_class_table[i].VOICETYPE + "_C.wav";
                         document.getElementById('Player').play();
                         ++stage_i;
                         break;
                     }
                 }
             }
-            else if (stage_i == 2)  // 要開了
+            else
             {
-                document.getElementById('Player').src = "train_voice/TIDS_Launching1_c.wav";
-                document.getElementById('Player').play();
-                ++stage_i;
-            }
-            else  // 請趕快上車
-            {
-                document.getElementById('Player').src = "train_voice/TIDS_End_c.wav";
-                document.getElementById('Player').play();
-                // reset trigger & counters
-                trigger = false;
-                train_num_i = 0;
-                stage_i = 0;
+                if (pending_trains.size > 0)
+                {
+                    // early terminate to play pending request
+                    is_playing = false;
+                    train_num_i = 0;
+                    stage_i = 0;
+                    return;
+                }
+
+                if (stage_i == 2)  // 快要開了
+                {
+                    document.getElementById('Player').src = "train_voice/TIDS_Launching1_c.wav";
+                    document.getElementById('Player').play();
+                    ++stage_i;
+                }
+                else  // 請趕快上車
+                {
+                    document.getElementById('Player').src = "train_voice/TIDS_End_c.wav";
+                    document.getElementById('Player').play();
+
+                    // teardown states
+                    is_playing = false;
+                    train_num_i = 0;
+                    stage_i = 0;
+                }
             }
         }
     }
